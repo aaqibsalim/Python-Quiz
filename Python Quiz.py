@@ -369,6 +369,99 @@ def restartq6():
     q6feedback.config(text = '')
     q6result.config(text = '')
 
+def submitq7(event = None):
+    q7feedback.config(text = 'Feedback:')
+
+    q7a_v = q7a_entry.get()
+    q7b_v = q7b_entry.get()
+    q7c_v = q7c_entry.get().replace(' ', '')
+    q7d_v = q7d_entry.get().replace(' ', '')
+    q7e_v = q7e_entry.get()
+
+    if q7a_v == 'True:' and q7b_v == '<' and q7c_v in ['x=x+1', 'x+=1'] and q7d_v in ["(f'{x}>=10')", '(f"{x}>=10")'] and q7e_v == 'break':
+        message = "Correct! This program will keep adding to x until it's greater than\nor equal to ten."
+        q7submit_button.config(state = 'disabled')
+        q7a_entry.config(state = 'disabled')
+        q7b_entry.config(state = 'disabled')
+        q7c_entry.config(state = 'disabled')
+        q7d_entry.config(state = 'disabled')
+        q7e_entry.config(state = 'disabled')
+    elif 'True' in q7a_v and ':' not in q7a_v:
+        message = "You're using the correct keyword 'True', however a colon is needed\nat the end."
+    elif q7a_v != 'True:':
+        message = "To create an infinite loop the word 'True' must be used after 'while'."
+    elif q7b_v != '<':
+        message = "To check if x is less than 10, the '<' symbol is used."
+    elif q7c_v not in ['x=x+1', 'x+=1']:
+        message = "To add 1 to x, you can use 'x = x + 1' or 'x += 1' for short."
+    elif 'f' not in q7d_v:
+        message = 'To embed a variable within a string, an f-string must be used.'
+    elif q7d_v not in ["(f'{x}>=10')", '(f"{x}>=10")']:
+        message = 'Incorrect print statement.'
+    elif q7e_v != 'break':
+        message = "To end a loop, the keyword is an all lowercase 'break'."
+    q7result.config(text = message)
+
+def restartq7():
+    q7submit_button.config(state = 'normal')
+    q7a_entry.config(state = 'normal')
+    q7b_entry.config(state = 'normal')
+    q7c_entry.config(state = 'normal')
+    q7d_entry.config(state = 'normal')
+    q7e_entry.config(state = 'normal')
+    q7a_entry.delete(0, 'end')
+    q7b_entry.delete(0, 'end')
+    q7c_entry.delete(0, 'end')
+    q7d_entry.delete(0, 'end')
+    q7e_entry.delete(0, 'end')
+    q7d_entry.insert(0, "('{x} >= 10')")
+    q7feedback.config(text = '')
+    q7result.config(text = '')
+
+def submitq8(event = None):
+    q8feedback.config(text = 'Feedback:')
+
+    q8a_v = q8a_entry.get()
+    q8b_v = q8b_entry.get()
+    q8c_v = q8c_entry.get()
+    q8d_v = q8d_entry.get()
+    
+    if q8a_v in q8c_v and q8a_v in q8d_v and q8b_v == 'input' and 'for' in q8c_v and f'in {q8a_v}:' in q8c_v and q8d_v == f'{q8a_v}[0]':
+        message = 'Perfect! This program functions as expected.'
+        q8submit_button.config(state = 'disabled')
+        q8a_entry.config(state = 'disabled')
+        q8b_entry.config(state = 'disabled')
+        q8c_entry.config(state = 'disabled')
+        q8d_entry.config(state = 'disabled')
+    elif q8a_v not in q8c_v or q8a_v not in q8d_v:
+        message = 'Variables names do not match.'
+    elif q8b_v != 'input':
+        message = 'Use the input function to allow the user to pick a word.'
+    elif 'for' in q8c_v and f'in {q8a_v}:' not in q8c_v:
+        message = "Starting the for loop with 'for' is correct, however you need to use the 'for (loopvar) in (var):' format."
+    elif 'for' not in q8c_v and f'in {q8a_v}:' not in q8c_v:
+        message = "Your for loop should begin with ''for (loopvar) in (var):'."
+    elif q8a_v in q8d_v and q8d_v != f'{q8a_v}[0]':
+        message = 'You correctly call your variable but to get the first letter an index of 0 must be used.'
+    elif q8d_v != f'{q8a_v}[0]':
+        message = 'To check the first letter of your variable use the index 0.'
+    else:
+        message = 'Incorrect.'
+    q8result.config(text = message)
+
+def restartq8():
+    q8submit_button.config(state = 'normal')
+    q8a_entry.config(state = 'normal')
+    q8b_entry.config(state = 'normal')
+    q8c_entry.config(state = 'normal')
+    q8d_entry.config(state = 'normal')
+    q8a_entry.delete(0, 'end')
+    q8b_entry.delete(0, 'end')
+    q8c_entry.delete(0, 'end')
+    q8d_entry.delete(0, 'end')
+    q8feedback.config(text = '')
+    q8result.config(text = '')
+
 root_quizone = tk.Frame(root_home)
 framelist.append(root_quizone)
 q1_background = tk.PhotoImage(file = 'Images\\quiz_one.png')
@@ -612,7 +705,7 @@ q6f_entry.place(x = 1252, y = 727)
 q6g = tk.Label(root_quizsix, text = '])', **label_style)
 q6g.place(x = 1272, y = 725)
 
-q6next = tk.Button(root_quizsix, text = 'Next', command = lambda: show_frame(root_quizzes), **topbutton_style).place(x = 1843, y = 429)
+q6next = tk.Button(root_quizsix, text = 'Next', command = lambda: show_frame(root_quizseven), **topbutton_style).place(x = 1843, y = 429)
 q6back = tk.Button(root_quizsix, text = 'Back', command = frame_back, **topbutton_style).place(x = 1678, y = 429)
 q6restart = tk.Button(root_quizsix, text = 'Restart', command = restartq6, **topbutton_style).place(x = 1750, y = 429)
 
@@ -626,6 +719,93 @@ q6result.place(x = 1150, y = 815)
 
 for i in [q6a_entry, q6b_entry, q6c_entry, q6d_entry, q6f_entry]:
     i.bind('<Return>', submitq6)
+
+root_quizseven = tk.Frame(root_home)
+framelist.append(root_quizseven)
+q7_background = tk.PhotoImage(file = 'Images\\quiz_seven.png')
+q7_background_label = tk.Label(root_quizseven, image = q7_background)
+q7_background_label.place(x = 0, y = 0)
+
+q7a = tk.Label(root_quizseven, text = 'while', **label_style)
+q7a.place(x = 1150, y = 600)
+q7a_entry = tk.Entry(root_quizseven, width =  4, **entry_style)
+q7a_entry.place(x = 1220, y = 600)
+q7b = tk.Label(root_quizseven, text = 'if x', **label_style)
+q7b.place(x = 1200, y = 640)
+q7b_entry = tk.Entry(root_quizseven, width = 1, **entry_style)
+q7b_entry.place(x = 1245, y = 642)
+q7c = tk.Label(root_quizseven, text = '10:', **label_style)
+q7c.place(x = 1265, y = 640)
+q7c_entry = tk.Entry(root_quizseven, width = 7, **entry_style)
+q7c_entry.place(x = 1245, y = 680)
+q7d = tk.Label(root_quizseven, text = 'else:', **label_style)
+q7d.place(x = 1200, y = 720)
+q7e = tk.Label(root_quizseven, text = 'print', **label_style)
+q7e.place(x = 1245, y = 760)
+q7d_entry = tk.Entry(root_quizseven, width = 10, **entry_style)
+q7d_entry.place(x = 1305, y = 760)
+q7d_entry.insert(0, "('{x} >= 10')")
+q7e_entry = tk.Entry(root_quizseven, width = 5, **entry_style)
+q7e_entry.place(x = 1245, y = 800)
+
+q7next = tk.Button(root_quizseven, text = 'Next', command = lambda: show_frame(root_quizeight), **topbutton_style).place(x = 1843, y = 429)
+q7back = tk.Button(root_quizseven, text = 'Back', command = frame_back, **topbutton_style).place(x = 1678, y = 429)
+q7restart = tk.Button(root_quizseven, text = 'Restart', command = restartq7, **topbutton_style).place(x = 1750, y = 429)
+
+q7submit_button = tk.Button(root_quizseven, text = 'Submit', command = submitq7, **subbutton_style)
+q7submit_button.place(x = 1510, y = 690)
+hoverbutton_list.append(q7submit_button)
+q7feedback = tk.Label(root_quizseven, **feedback_style)
+q7feedback.place(x = 1150, y = 880)
+q7result = tk.Label(root_quizseven, **label_style)
+q7result.place(x = 1150, y = 915)
+
+for i in [q7a_entry, q7b_entry, q7c_entry, q7d_entry, q7e_entry]:
+    i.bind('<Return>', submitq7)
+
+root_quizeight = tk.Frame(root_home)
+framelist.append(root_quizeight)
+q8_background = tk.PhotoImage(file = 'Images\\quiz_eight.png')
+q8_background_label = tk.Label(root_quizeight, image = q8_background)
+q8_background_label.place(x = 0, y = 0)
+
+q8a_entry = tk.Entry(root_quizeight, width = 6, **entry_style)
+q8a_entry.place(x = 1150, y = 610)
+q8a = tk.Label(root_quizeight, text = '=', **label_style)
+q8a.place(x = 1250, y = 610)
+q8b_entry = tk.Entry(root_quizeight, width = 5, **entry_style)
+q8b_entry.place(x = 1293, y = 610)
+q8b = tk.Label(root_quizeight, text = "('Pick a word: ')", **label_style)
+q8b.place(x = 1355, y = 607)
+q8c_entry = tk.Entry(root_quizeight, width = 11, **entry_style)
+q8c_entry.place(x = 1150, y = 660)
+q8c = tk.Label(root_quizeight, text = 'if', **label_style)
+q8c.place(x = 1200, y = 710)
+q8d_entry = tk.Entry(root_quizeight, width = 8, **entry_style)
+q8d_entry.place(x = 1230, y = 710)
+q8d = tk.Label(root_quizeight, text = "in ['a', 'e', 'i', 'o', 'u']:", **label_style)
+q8d.place(x = 1340, y = 710)
+q8e = tk.Label(root_quizeight, text = "print('This word starts with a vowel.')", **label_style)
+q8e.place(x = 1250, y = 755)
+q8f = tk.Label(root_quizeight, text = 'else:', **label_style)
+q8f.place(x = 1200, y = 805)
+q8g = tk.Label(root_quizeight, text = "print('This word does not start with a vowel.')", **label_style)
+q8g.place(x = 1250, y = 850)
+
+q8next = tk.Button(root_quizeight, text = 'Next', command = lambda: show_frame(root_quizzes), **topbutton_style).place(x = 1843, y = 429)
+q8back = tk.Button(root_quizeight, text = 'Back', command = frame_back, **topbutton_style).place(x = 1678, y = 429)
+q8restart = tk.Button(root_quizeight, text = 'Restart', command = restartq8, **topbutton_style).place(x = 1750, y = 429)
+
+q8submit_button = tk.Button(root_quizeight, text = 'Submit', command = submitq8, **subbutton_style)
+q8submit_button.place(x = 1600, y = 660)
+hoverbutton_list.append(q8submit_button)
+q8feedback = tk.Label(root_quizeight, **feedback_style)
+q8feedback.place(x = 1150, y = 920)
+q8result = tk.Label(root_quizeight, **label_style)
+q8result.place(x = 1150, y = 955)
+
+for i in [q8a_entry, q8b_entry, q8c_entry, q8d_entry]:
+    i.bind('<Return>', submitq8)
 
 root_guideone = tk.Frame(root_home)
 framelist.append(root_guideone)
@@ -656,7 +836,7 @@ g3button.place(x = 905, y = 415)
 g4button.place(x = 1133, y = 415)
 g5button.place(x = 1360, y = 415)
 hoverbutton_list.extend([g1button, g2button, g3button, g4button, g5button])
-guidesback = tk.Button(root_guides, text = 'Back', command = lambda: back_home()).place(x = 50, y = 100)
+guidesback = tk.Button(root_guides, text = 'Back', command = back_home).place(x = 50, y = 100)
 
 root_quizzes = tk.Frame(root_home)
 framelist.append(root_quizzes)
@@ -670,14 +850,18 @@ q3button = tk.Button(root_quizzes, text = 'Q3', command = lambda: show_frame(roo
 q4button = tk.Button(root_quizzes, text = 'Q4', command = lambda: show_frame(root_quizfour), **bigbutton_style)
 q5button = tk.Button(root_quizzes, text = 'Q5', command = lambda: show_frame(root_quizfive), **bigbutton_style)
 q6button = tk.Button(root_quizzes, text = 'Q6', command = lambda: show_frame(root_quizsix), **bigbutton_style)
+q7button = tk.Button(root_quizzes, text = 'Q7', command = lambda: show_frame(root_quizseven), **bigbutton_style)
+q8button = tk.Button(root_quizzes, text = 'Q8', command = lambda: show_frame(root_quizeight), **bigbutton_style)
 q1button.place(x = 450, y = 415)
 q2button.place(x = 678, y = 415)
 q3button.place(x = 905, y = 415)
 q4button.place(x = 1133, y = 415)
 q5button.place(x = 1360, y = 415)
 q6button.place(x = 450, y = 615)
-hoverbutton_list.extend([q1button, q2button, q3button, q4button, q5button, q6button])
-quizzesback = tk.Button(root_quizzes, text = 'Back', command = lambda: back_home()).place(x = 50, y = 100)
+q7button.place(x = 678, y = 615)
+q8button.place(x = 905, y = 615)
+hoverbutton_list.extend([q1button, q2button, q3button, q4button, q5button, q6button, q7button, q8button])
+quizzesback = tk.Button(root_quizzes, text = 'Back', command = back_home).place(x = 50, y = 100)
 
 background = tk.PhotoImage(file = 'Images\\home_page.png')
 background_label = tk.Label(root_home, image = background)
