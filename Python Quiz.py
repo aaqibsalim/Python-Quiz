@@ -1,8 +1,6 @@
 import ctypes
 import tkinter as tk
 from tkinter.font import Font
-import os
-from path_function import resource_path
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
@@ -11,10 +9,9 @@ root_home = tk.Tk()
 root_home.title('Python Quiz')
 root_home.geometry("1920x1080")
 root_home.resizable(False, False)
-root_home.iconphoto(True, tk.PhotoImage(file = resource_path("Images/python_icon.png")))
+root_home.iconphoto(True, tk.PhotoImage(file = 'Images/python_icon.png'))
 screen_width = root_home.winfo_screenwidth()
 screen_height = root_home.winfo_screenheight()
-y_scale = screen_height / 1080
 # Finds screen dimensions and uses that to find a scale for the fonts.
 
 # If the screen dimensions match the app, it goes into fullscreen.
@@ -27,6 +24,7 @@ framelist = []
 help_framelist = []
 hoverbutton_list = []
 rhoverbutton_list = []
+quit_hoverlist = []
 
 # Dictionary which is used to make the help button toggle on and off.
 open_close = {'q1help': False, 'q2help': False, 'q3help': False, 'q4help': False, 'q5help': False, 'q6help': False, 'q7help': False, 'q8help': False, 'q9help': False}
@@ -73,14 +71,13 @@ def load_helpframes():
         frame.place(x = 1015, y = 350)
         close_help(frame)
 
-# Used for hover effects, 3 variations for opposite colours schemes and then the quit button.
+# Used for hover effects, 4 variations for opposite colours schemes and then the quit and home page buttons.
 def on_enter(event):
     if event.widget['state'] == 'normal':
         event.widget.config(background = '#275b84', foreground = '#ffde57')
 
 def ron_enter(event):
-    if event.widget['state'] == 'normal':
-        event.widget.config(background = '#ffde57', foreground = '#275b84')
+    event.widget.config(background = '#ffde57', foreground = '#275b84')
 
 def on_leave(event):
     event.widget.config(background = '#ffde57', foreground = '#275b84')
@@ -94,6 +91,18 @@ def quit_enter(event):
 def quit_leave(event):
     event.widget.config(background = '#e81123', foreground = '#ffffff')
 
+def image_enter(event):
+    if event.widget['font'] == str(segoe_s):
+        event.widget.config(image = altquiz_button_img)
+    else:
+        event.widget.config(image = altguides_button_img)
+
+def image_leave(event):
+    if event.widget['font'] == str(segoe_b):
+        event.widget.config(image = guides_button_img)
+    else:
+        event.widget.config(image = quiz_button_img)
+
 # Binds each button I added to the hoverbutton_list to the hover effects.
 def loadbutton():
     for button in hoverbutton_list:
@@ -102,10 +111,21 @@ def loadbutton():
     for button in rhoverbutton_list:
         button.bind('<Enter>', ron_enter)
         button.bind('<Leave>', ron_leave)
+    for button in quit_hoverlist:
+        button.bind('<Enter>', quit_enter)
+        button.bind('<Leave>', quit_leave)
+
+# Get actual system DPI (96 = 100%, 120 = 125%, etc.)
+dc = ctypes.windll.user32.GetDC(0)
+dpi = ctypes.windll.gdi32.GetDeviceCaps(dc, 88)
+ctypes.windll.user32.ReleaseDC(0, dc)
+
+# Calculate DPI scale factor
+dpi_scale = dpi / 96
 
 # Calculates the font scale.
-def font_scale(size, scaled_size):
-    return int(size * scaled_size)
+def font_scale(size):
+    return int(size / dpi_scale)
 
 # Checks if the user has unlocked the final quiz or not based on the other quiz results.
 def final_unlocked():
@@ -115,13 +135,13 @@ def final_unlocked():
         q9next.config(state = 'normal')
 
 # Defines font variables used for consistent styling.
-segoe_b = Font(family = 'Segoe UI Variable Text Semibold', size = font_scale(14, y_scale))
-segoe_s = Font(family = 'Segoe UI Variable Text Semibold', size = font_scale(12, y_scale))
-segoe_bo = Font(family = 'Segoe UI Variable Text', size = font_scale(15, y_scale), weight = 'bold')
-rockwell_b = Font(family = 'Rockwell', size = font_scale(30, y_scale), weight = 'bold')
+segoe_b = Font(family = 'Segoe UI Variable Text Semibold', size = font_scale(17.5))
+segoe_s = Font(family = 'Segoe UI Variable Text Semibold', size = font_scale(15))
+segoe_bo = Font(family = 'Segoe UI Variable Text', size = font_scale(18.75), weight = 'bold')
+rockwell_b = Font(family = 'Rockwell', size = font_scale(37.5), weight = 'bold')
 
 # Defines styles for the various widgets.
-label_style = {'font': segoe_b, 'background': '#0277bc', 'foreground': '#ffffff'}
+label_style = {'font': segoe_b, 'background': '#0277bc', 'foreground': '#ffffff', 'wraplength': '740'}
 entry_style = {'font': segoe_b, 'background': '#275b84', 'disabledbackground': '#275b84', 'foreground': '#ffffff', 'borderwidth': 0}
 feedback_style = {'font': segoe_bo, 'bg': '#0277bc', 'fg': '#ffde57'}
 textbox_style = {'font': segoe_b, 'background': '#275b84', 'foreground': '#ffffff', 'borderwidth': 0}
@@ -130,19 +150,19 @@ topbutton_style = {'font': segoe_s, 'background': '#ffde57', 'foreground': '#275
 bigbutton_style = {'font': rockwell_b, 'background': '#ffde57', 'foreground': '#275b84', 'borderwidth': 0, 'activebackground': '#275b84', 'activeforeground': '#ffde57'}
 
 #Initialising the global variables used in each submit function to check if it's been completed (see below).
-q1correct = True
-q2correct = True
-q3correct = True
-q4correct = True
-q5correct = True
-q6correct = True
-q7correct = True
-q8correct = True
-q9correct = True
+q1correct = False
+q2correct = False
+q3correct = False
+q4correct = False
+q5correct = False
+q6correct = False
+q7correct = False
+q8correct = False
+q9correct = False
 
 # Other global variables, both so that they can be changed outside their main functions.
 q2guessed_operations = set()
-course_passed = "Congratulations, you've successfully completed this quiz and the entire\nPython course. Well done!"
+course_passed = "Congratulations, you've successfully completed this quiz and the entire Python course. Well done!"
 
 # The following functions are submit and restart functions for every quiz (10 in total).
 # Submit functions get the user inputs from entries, checks for mistakes, and gives feedback based on those mistakes.
@@ -184,9 +204,9 @@ def submitq1(x = None):
             q1b_entry.config(state = 'disabled')
         else:
             if 'hello' in q1b_v or "'hello'" in q1b_v or '"hello"' in q1b_v or '15' in q1b_v or '3.14' in q1b_v or 'False' in q1b_v:
-                q1result.config(text = "Print the variable names, not the values. E.g string instead\nof 'hello'.")
+                q1result.config(text = "Print the variable names, not the values. E.g string instead of 'hello'.")
             else:
-                q1result.config(text = 'Your data types are correctly matched, but check your print\n statement and remember commas!')
+                q1result.config(text = 'Your data types are correctly matched, but check your print statement and remember commas!')
     else:
         if correct_no == 1:
             q1result.config(text = '1/4 data type is correct.')
@@ -223,11 +243,11 @@ def submitq2(x = None):
     q2correct_ans = ['print(x + y)', 'print(x - y)', 'print(x * y)', 'print(x / y)']
     if q2guess not in q2correct_ans:
         if 'print' != q2a_v.lower() and q2b_v not in ['+', '-', '*', '/']:
-            incorrect_message = 'Use the print function to display and the operations (+, -, *, /)\nto calculate.'
+            incorrect_message = 'Use the print function to display and the operations (+, -, *, /) to calculate.'
         elif 'print' == q2a_v.lower() and q2b_v not in ['+', '-', '*', '/']:
-            incorrect_message = 'The print function is correctly used, however use the operations\n(+, -, *, /) to calculate.'
+            incorrect_message = 'The print function is correctly used, however use the operations (+, -, *, /) to calculate.'
         elif 'print' != q2a_v.lower() and q2b_v  in ['+', '-', '*', '/']:
-            incorrect_message = 'You are correctly using an operation, however the print function is\nneeded to display the result.'
+            incorrect_message = 'You are correctly using an operation, however the print function is needed to display the result.'
         else:
             incorrect_message = "Make sure the 'print()' function is lowercase."
         q2result.config(text = incorrect_message)
@@ -244,7 +264,6 @@ def submitq2(x = None):
 
 def restartq2():
 
-    global q2guessed_operations
     q2submit_button.config(state = 'normal')
     q2a_entry.config(state = 'normal')
     q2b_entry.config(state = 'normal')
@@ -267,7 +286,7 @@ def submitq3(x = None):
     
     if q3a_v == 'if' and q3b_v == '>' and q3c_v in ['x*y', 'y*x'] and q3d_v == 'else:' and q3e_v in ['x+y', 'y+x']:
         q3correct = True
-        message = 'Perfect! This program will print 50 as 10 * 5 is\ngreater than 30.'
+        message = 'Perfect! This program will print 50 as 10 * 5 is greater than 30.'
         q3submit_button.config(state = 'disabled')
         q3a_entry.config(state = 'disabled')
         q3b_entry.config(state = 'disabled')
@@ -276,15 +295,15 @@ def submitq3(x = None):
         q3e_entry.config(state = 'disabled')
     else:
         if q3a_v != 'if' or 'else' not in q3d_v:
-            message = "If-Else statements require lowercase 'if' and\n'else'."
+            message = "If-Else statements require lowercase 'if' and 'else'."
         elif 'else' in q3d_v and q3d_v != 'else:':
-            message = 'Colons (:) must be used after each if-else\nstatement.'
+            message = 'Colons (:) must be used after each if-else statement.'
         elif q3b_v != '>':
-            message = "To check if a number is greater than another,\nthe '>' symbol is used."
+            message = "To check if a number is greater than another, the '>' symbol is used."
         elif q3c_v not in ['x*y', 'y*x']:
-            message = 'To print the product (x * y) place it inside the\nprint statement.'
+            message = 'To print the product (x * y) place it inside the print statement.'
         elif q3e_v not in ['x+y', 'y+x']:
-            message = 'The sum is equal to (x + y), place it inside the\nprint statement to display.'
+            message = 'The sum is equal to (x + y), place it inside the print statement to display.'
         else:
             message = 'Incorrect.'
     q3result.config(text = message)
@@ -318,7 +337,7 @@ def submitq4(x = None):
     
     if q4a_v == q4c_v != '' and q4b_v == "input('Are you enjoying this course?')" and q4d_v == 'else:':
         q4correct = True
-        message = 'Correct! inpt -> input, the inside of your input function is a string,\nyour else is lowercase with a colon, and your variable names match.'
+        message = 'Correct! inpt -> input, the inside of your input function is a string, your else is lowercase with a colon, and your variable names match.'
         q4submit_button.config(state = 'disabled')
         q4a_entry.config(state = 'disabled')
         q4b_entry.config(state = 'disabled')
@@ -368,7 +387,7 @@ def submitq5(x = None):
 
     if q5guess == q5expected:
         q5correct = True
-        message = 'Correct! f strings and curly brackets are used to display variables in a\nstring.'
+        message = 'Correct! f strings and curly brackets are used to display variables in a string.'
         q5submit_button.config(state = 'disabled')
         q5a_entry.config(state = 'disabled')
         q5b_entry.config(state = 'disabled')
@@ -377,13 +396,13 @@ def submitq5(x = None):
         q5e_entry.config(state = 'disabled')
     else:
         if 'john' in q5guess.lower() or 'lawyer' in q5guess.lower() or '34' in q5guess:
-            message = "Instead of putting the specific name/job/age we should put the variable\nnames instead. E.g: {name} instead of John."
+            message = "Instead of putting the specific name/job/age we should put the variable names instead. E.g: {name} instead of John."
         elif "f'" in q5guess and '{' not in q5guess:
-            message = "You are correct in using an f string but the variables should be inside\ncurly brackets."
+            message = "You are correct in using an f string but the variables should be inside curly brackets."
         elif '{' in q5guess and "f'" not in q5guess:
-            message = "The variables are correctly placed in curly brackets. However, to have\nvariables inside a string, an f string (f') must be used."
+            message = "The variables are correctly placed in curly brackets. However, to have variables inside a string, an f string (f') must be used."
         elif "'" in q5guess and "f'" not in q5guess:
-            message = "Remember to use an f string (f') when including variables within the\nstring."
+            message = "Remember to use an f string (f') when including variables within the string."
         elif "f'" in q5guess and '{' in q5guess:
             message = 'Check to make sure your sentence makes sense.'
         else:
@@ -442,7 +461,7 @@ def submitq6(x = None):
     elif q6e_v != 'list':
         message = 'To access the index of a list, the list name must be used.'
     elif q6f_v not in ['-1', '2']:
-        message = 'The last item can be accessed through an index of -1, or 2 since\nthere are 3 items.'
+        message = 'The last item can be accessed through an index of -1, or 2 since there are 3 items.'
     else:
         message = 'Incorrect.'
 
@@ -480,7 +499,7 @@ def submitq7(x = None):
 
     if q7a_v == 'True:' and q7b_v == '<' and q7c_v in ['x=x+1', 'x+=1'] and q7d_v in ["(f'{x}>=10')", '(f"{x}>=10")'] and q7e_v == 'break':
         q7correct = True
-        message = "Correct! This program will keep adding to x until it's greater than\nor equal to ten."
+        message = "Correct! This program will keep adding to x until it's greater than or equal to ten."
         q7submit_button.config(state = 'disabled')
         q7a_entry.config(state = 'disabled')
         q7b_entry.config(state = 'disabled')
@@ -488,7 +507,7 @@ def submitq7(x = None):
         q7d_entry.config(state = 'disabled')
         q7e_entry.config(state = 'disabled')
     elif 'True' in q7a_v and ':' not in q7a_v:
-        message = "You're using the correct keyword 'True', however a colon is needed\nat the end."
+        message = "You're using the correct keyword 'True', however a colon is needed at the end."
     elif q7a_v != 'True:':
         message = "To create an infinite loop the word 'True' must be used after 'while'."
     elif q7b_v != '<':
@@ -542,11 +561,11 @@ def submitq8(x = None):
     elif q8b_v != 'input':
         message = 'Use the input function to allow the user to pick a word.'
     elif 'for' in q8c_v and f'in {q8a_v}:' not in q8c_v:
-        message = "Starting the for loop with 'for' is correct, however you need to use the\n'for (loopvar) in (var):' format."
+        message = "Starting the for loop with 'for' is correct, however you need to use the 'for (loopvar) in (var):' format."
     elif 'for' not in q8c_v and f'in {q8a_v}:' not in q8c_v:
         message = "Your for loop should begin with ''for (loopvar) in (var):'."
     elif q8a_v in q8d_v and q8d_v != f'{q8a_v}[0]':
-        message = 'You correctly call your variable but to get the first letter an index of 0\nmust be used.'
+        message = 'You correctly call your variable but to get the first letter an index of 0 must be used.'
     elif q8d_v != f'{q8a_v}[0]':
         message = 'To check the first letter of your variable use the index 0.'
     else:
@@ -602,7 +621,7 @@ def submitq9(x = None):
     elif 'print' not in q9f_v:
         message = 'To display the output, the print function is still needed.'
     elif 'check_even' not in q9f_v:
-        message = "To call the function use it's name (check_even)."
+        message = "To call the function use its name (check_even)."
     elif q9f_v.count('(') != 2 or q9f_v.count(')') != 2 or '))' not in q9f_v:
         message = 'Check your brackets when displaying / calling the function.'
     elif q9f_v[q9f_v.index('))')-1] == '(':
@@ -654,9 +673,8 @@ def submitq10():
             if passed_cases == 4:
                 message = course_passed
                 course_passed = 'The function is successful and passes all cases.'
-                q10submit_button.config(foreground = 'grey')
                 q10submit_button.config(state = 'disabled')
-                q10_entry.config(state = 'disabled')
+                q10_entry.config(foreground = 'grey', state = 'disabled')
             else:
                 message = f'{passed_cases}/4 cases passed.'
         else:
@@ -679,8 +697,7 @@ quit_button_frame = tk.Frame(root_home, width = 50, height = 50, bg = '#e81123')
 quit_button_frame.place(relx = 0.99, rely = 0.01, anchor = 'ne')
 quit_button = tk.Button(quit_button_frame, text = '❌', command = lambda: root_home.destroy(), width = 5, font  = segoe_bo, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 quit_button.place(relx = 0.5, rely = 0.5, anchor = 'center')
-quit_button.bind('<Enter>', quit_enter)
-quit_button.bind('<Leave>', quit_leave)
+quit_hoverlist.append(quit_button)
 
 # Each quiz has the same main components. 
 # The question widgets, which are the entries and labels making up the actual question.
@@ -693,7 +710,7 @@ quit_button.bind('<Leave>', quit_leave)
 # Frame for quiz one which all entries, labels, and buttons are placed upon.
 root_quizone = tk.Frame(root_home)
 framelist.append(root_quizone)
-q1_background = tk.PhotoImage(file = resource_path('Images/quiz_one.png'))
+q1_background = tk.PhotoImage(file = 'Images/quiz_one.png')
 q1_background_label = tk.Label(root_quizone, image = q1_background)
 q1_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -746,7 +763,7 @@ for i in [q1a1_entry, q1a2_entry, q1a3_entry, q1a4_entry, q1b_entry]:
 # Frame for quiz two.
 root_quiztwo = tk.Frame(root_home)
 framelist.append(root_quiztwo)
-q2_background = tk.PhotoImage(file = resource_path('Images/quiz_two.png'))
+q2_background = tk.PhotoImage(file = 'Images/quiz_two.png')
 q2_background_label = tk.Label(root_quiztwo, image = q2_background)
 q2_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -785,7 +802,7 @@ for i in [q2a_entry, q2b_entry]:
 # Frame for quiz three.
 root_quizthree = tk.Frame(root_home, borderwidth=0, highlightthickness=0)
 framelist.append(root_quizthree)
-q3_background = tk.PhotoImage(file = resource_path('Images/quiz_three.png'))
+q3_background = tk.PhotoImage(file = 'Images/quiz_three.png')
 q3_background_label = tk.Label(root_quizthree, image = q3_background)
 q3_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -834,7 +851,7 @@ for i in [q3a_entry, q3b_entry, q3c_entry, q3d_entry, q3e_entry]:
 # Frame for quiz four.
 root_quizfour = tk.Frame(root_home)
 framelist.append(root_quizfour)
-q4_background = tk.PhotoImage(file = resource_path('Images/quiz_four.png'))
+q4_background = tk.PhotoImage(file = 'Images/quiz_four.png')
 q4_background_label = tk.Label(root_quizfour, image = q4_background)
 q4_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -883,7 +900,7 @@ for i in [q4a_entry, q4b_entry, q4c_entry, q4d_entry]:
 # Frame for quiz five.
 root_quizfive = tk.Frame(root_home)
 framelist.append(root_quizfive)
-q5_background = tk.PhotoImage(file = resource_path('Images/quiz_five.png'))
+q5_background = tk.PhotoImage(file = 'Images/quiz_five.png')
 q5_background_label = tk.Label(root_quizfive, image = q5_background)
 q5_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -931,7 +948,7 @@ for i in [q5a_entry, q5b_entry, q5c_entry, q5d_entry, q5e_entry]:
 # Frame for quiz six.
 root_quizsix = tk.Frame(root_home)
 framelist.append(root_quizsix)
-q6_background = tk.PhotoImage(file = resource_path('Images/quiz_six.png'))
+q6_background = tk.PhotoImage(file = 'Images/quiz_six.png')
 q6_background_label = tk.Label(root_quizsix, image = q6_background)
 q6_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -987,7 +1004,7 @@ for i in [q6a_entry, q6b_entry, q6c_entry, q6d_entry, q6e_entry, q6f_entry]:
 # Frame for quiz seven.
 root_quizseven = tk.Frame(root_home)
 framelist.append(root_quizseven)
-q7_background = tk.PhotoImage(file = resource_path('Images/quiz_seven.png'))
+q7_background = tk.PhotoImage(file = 'Images/quiz_seven.png')
 q7_background_label = tk.Label(root_quizseven, image = q7_background)
 q7_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1036,7 +1053,7 @@ for i in [q7a_entry, q7b_entry, q7c_entry, q7d_entry, q7e_entry]:
 # Frame for quiz eight.
 root_quizeight = tk.Frame(root_home)
 framelist.append(root_quizeight)
-q8_background = tk.PhotoImage(file = resource_path('Images/quiz_eight.png'))
+q8_background = tk.PhotoImage(file = 'Images/quiz_eight.png')
 q8_background_label = tk.Label(root_quizeight, image = q8_background)
 q8_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1086,7 +1103,7 @@ for i in [q8a_entry, q8b_entry, q8c_entry, q8d_entry]:
 # Frame for quiz nine.
 root_quiznine = tk.Frame(root_home)
 framelist.append(root_quiznine)
-q9_background = tk.PhotoImage(file = resource_path('Images/quiz_nine.png'))
+q9_background = tk.PhotoImage(file = 'Images/quiz_nine.png')
 q9_background_label = tk.Label(root_quiznine, image = q9_background)
 q9_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1141,7 +1158,7 @@ for i in [q9a_entry, q9b_entry, q9c_entry, q9d_entry, q9e_entry, q9f_entry]:
 # Frame for the final quiz, quiz ten.
 root_quizten = tk.Frame(root_home)
 framelist.append(root_quizten)  
-q10_background = tk.PhotoImage(file = resource_path('Images/quiz_ten.png'))
+q10_background = tk.PhotoImage(file = 'Images/quiz_ten.png')
 q10_background_label = tk.Label(root_quizten, image = q10_background)
 q10_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1163,7 +1180,7 @@ q10submit_button.place(x = 1830, y = 429)
 hoverbutton_list.append(q10submit_button)
 q10feedback = tk.Label(root_quizten, **feedback_style)
 q10feedback.place(x = 1150, y = 920)
-q10result = tk.Label(root_quizten, **label_style)
+q10result = tk.Label(root_quizten, justify = 'left', **label_style)
 q10result.place(x = 1150, y = 955)
 hoverbutton_list.extend([q10menu, q10back, q10restart, q10submit_button])
 
@@ -1177,7 +1194,7 @@ hoverbutton_list.extend([q10menu, q10back, q10restart, q10submit_button])
 # Frame for guide one.
 root_guideone = tk.Frame(root_home)
 framelist.append(root_guideone)
-g1_background = tk.PhotoImage(file = resource_path('Images/guide_one.png'))
+g1_background = tk.PhotoImage(file = 'Images/guide_one.png')
 g1_background_label = tk.Label(root_guideone, image = g1_background)
 g1_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1192,7 +1209,7 @@ hoverbutton_list.extend([g1menu, g1quiz_button, g1next])
 # Frame for guide two.
 root_guidetwo = tk.Frame(root_home)
 framelist.append(root_guidetwo)
-g2_background = tk.PhotoImage(file = resource_path('Images/guide_two.png'))
+g2_background = tk.PhotoImage(file = 'Images/guide_two.png')
 g2_background_label = tk.Label(root_guidetwo, image = g2_background)
 g2_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1209,7 +1226,7 @@ hoverbutton_list.extend([g2menu, g2quiz_button, g2next, g2back])
 # Frame for guide three.
 root_guidethree = tk.Frame(root_home)
 framelist.append(root_guidethree)
-g3_background = tk.PhotoImage(file = resource_path('Images/guide_three.png'))
+g3_background = tk.PhotoImage(file = 'Images/guide_three.png')
 g3_background_label = tk.Label(root_guidethree, image = g3_background)
 g3_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1227,7 +1244,7 @@ hoverbutton_list.extend([g3menu, g3quiz_button, g3next, g3back])
 # Frame for guide four.
 root_guidefour = tk.Frame(root_home)
 framelist.append(root_guidefour)
-g4_background = tk.PhotoImage(file = resource_path('Images/guide_four.png'))
+g4_background = tk.PhotoImage(file = 'Images/guide_four.png')
 g4_background_label = tk.Label(root_guidefour, image = g4_background)
 g4_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1244,7 +1261,7 @@ hoverbutton_list.extend([g4menu, g4quiz_button, g4next, g4back])
 # Frame for guide five.
 root_guidefive = tk.Frame(root_home)
 framelist.append(root_guidefive)
-g5_background = tk.PhotoImage(file = resource_path('Images/guide_five.png'))
+g5_background = tk.PhotoImage(file = 'Images/guide_five.png')
 g5_background_label = tk.Label(root_guidefive, image = g5_background)
 g5_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1261,7 +1278,7 @@ hoverbutton_list.extend([g5menu, g5quiz_button, g5next, g5back])
 # Frame for guide six.
 root_guidesix = tk.Frame(root_home)
 framelist.append(root_guidesix)
-g6_background = tk.PhotoImage(file = resource_path('Images/guide_six.png'))
+g6_background = tk.PhotoImage(file = 'Images/guide_six.png')
 g6_background_label = tk.Label(root_guidesix, image = g6_background)
 g6_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1278,7 +1295,7 @@ hoverbutton_list.extend([g6menu, g6quiz_button, g6next, g6back])
 # Frame for guide seven.
 root_guideseven = tk.Frame(root_home)
 framelist.append(root_guideseven)
-g7_background = tk.PhotoImage(file = resource_path('Images/guide_seven.png'))
+g7_background = tk.PhotoImage(file = 'Images/guide_seven.png')
 g7_background_label = tk.Label(root_guideseven, image = g7_background)
 g7_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1295,7 +1312,7 @@ hoverbutton_list.extend([g7menu, g7quiz_button, g7next, g7back])
 # Frame for guide eight.
 root_guideeight = tk.Frame(root_home)
 framelist.append(root_guideeight)
-g8_background = tk.PhotoImage(file = resource_path('Images/guide_eight.png'))
+g8_background = tk.PhotoImage(file = 'Images/guide_eight.png')
 g8_background_label = tk.Label(root_guideeight, image = g8_background)
 g8_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1312,7 +1329,7 @@ hoverbutton_list.extend([g8menu, g8quiz_button, g8next, g8back])
 # Frame for guide nine.
 root_guidenine = tk.Frame(root_home)
 framelist.append(root_guidenine)
-g9_background = tk.PhotoImage(file = resource_path('Images/guide_nine.png'))
+g9_background = tk.PhotoImage(file = 'Images/guide_nine.png')
 g9_background_label = tk.Label(root_guidenine, image = g9_background)
 g9_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1329,7 +1346,7 @@ hoverbutton_list.extend([g9menu, g9quiz_button, g9next, g9back])
 # Frame for final guide, guide ten.
 root_guideten = tk.Frame(root_home)
 framelist.append(root_guideten)
-g10_background = tk.PhotoImage(file = resource_path('Images/guide_ten.png'))
+g10_background = tk.PhotoImage(file = 'Images/guide_ten.png')
 g10_background_label = tk.Label(root_guideten, image = g10_background)
 g10_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1344,7 +1361,7 @@ hoverbutton_list.extend([g10menu, g10quiz_button, g10back])
 # Menu page for Guides
 root_guides = tk.Frame(root_home)
 framelist.append(root_guides)
-guides_background = tk.PhotoImage(file = resource_path('Images/guides.png'))
+guides_background = tk.PhotoImage(file = 'Images/guides.png')
 guides_background_label = tk.Label(root_guides, image = guides_background)
 guides_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1373,14 +1390,14 @@ g10button.place(x = 1360, y = 615)
 
 # Binding them all to hover effects and back-to-home button.
 hoverbutton_list.extend([g1button, g2button, g3button, g4button, g5button, g6button, g7button, g8button, g9button, g10button])
-guidesback = tk.Button(root_guides, text = 'Back', command = back_home, font = segoe_s, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
-guidesback.place(x = 935, y = 550)
+guidesback = tk.Button(root_guides, text = 'Back', command = back_home, font = segoe_bo, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
+guidesback.place(x = 450, y = 820)
 rhoverbutton_list.append(guidesback)
 
 # Menu page for Quizzes.
 root_quizzes = tk.Frame(root_home)
 framelist.append(root_quizzes)
-quizzes_background = tk.PhotoImage(file = resource_path('Images/quizzes.png'))
+quizzes_background = tk.PhotoImage(file = 'Images/quizzes.png')
 quizzes_background_label = tk.Label(root_quizzes, image = quizzes_background)
 quizzes_background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
@@ -1409,8 +1426,8 @@ q10button.place(x = 1360, y = 615)
 
 # Binding them all to hover effects and back-to-home button.
 hoverbutton_list.extend([q1button, q2button, q3button, q4button, q5button, q6button, q7button, q8button, q9button, q10button])
-quizzesback = tk.Button(root_quizzes, text = 'Back', command = back_home, font = segoe_s, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
-quizzesback.place(x = 935, y = 550)
+quizzesback = tk.Button(root_quizzes, text = 'Back', command = back_home, font = segoe_bo, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
+quizzesback.place(x = 450, y = 820)
 rhoverbutton_list.append(quizzesback)
 
 # The following are the help buttons on each quiz and the small frames each of them opens.
@@ -1418,6 +1435,9 @@ rhoverbutton_list.append(quizzesback)
 # The help button itself can also be used to close as it toggles.
 
 # Help frame for quiz one.
+
+help_img = tk.PhotoImage(file = 'Images/help_button.png')
+
 root_q1help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
 help_framelist.append(root_q1help)
 q1_guidebutton = tk.Button(root_q1help, text = 'Visit Guide One?', command = lambda: quiz_to_guide(root_guideone, root_q1help), font = segoe_s, background = '#275b84', foreground = '#ffde57', activebackground = '#ffde57', activeforeground = '#275b84', borderwidth = 0)
@@ -1425,11 +1445,9 @@ q1_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q1_guidebutton)
 q1_guidecross = tk.Button(root_q1help, text = 'X', command = lambda: close_help(root_q1help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q1_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q1help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q1help_label = tk.Label(root_quizone, image = q1help_img)
-q1help_button = tk.Button(root_quizone, command = lambda: show_help(root_q1help), image = q1help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q1help_label, q1help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q1_guidecross)
+q1help_button = tk.Button(root_quizone, command = lambda: show_help(root_q1help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q1help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz two.
 root_q2help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1439,11 +1457,9 @@ q2_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q2_guidebutton)
 q2_guidecross = tk.Button(root_q2help, text = 'X', command = lambda: close_help(root_q2help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q2_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q2help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q2help_label = tk.Label(root_quiztwo, image = q2help_img)
-q2help_button = tk.Button(root_quiztwo, command = lambda: show_help(root_q2help), image = q2help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q2help_label, q2help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q2_guidecross)
+q2help_button = tk.Button(root_quiztwo, command = lambda: show_help(root_q2help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q2help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz three.
 root_q3help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1453,11 +1469,9 @@ q3_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q3_guidebutton)
 q3_guidecross = tk.Button(root_q3help, text = 'X', command = lambda: close_help(root_q3help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q3_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q3help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q3help_label = tk.Label(root_quizthree, image = q3help_img)
-q3help_button = tk.Button(root_quizthree, command = lambda: show_help(root_q3help), image = q3help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q3help_label, q3help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q3_guidecross)
+q3help_button = tk.Button(root_quizthree, command = lambda: show_help(root_q3help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q3help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz four.
 root_q4help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1467,11 +1481,9 @@ q4_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q4_guidebutton)
 q4_guidecross = tk.Button(root_q4help, text = 'X', command = lambda: close_help(root_q4help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q4_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q4help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q4help_label = tk.Label(root_quizfour, image = q4help_img)
-q4help_button = tk.Button(root_quizfour, command = lambda: show_help(root_q4help), image = q4help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q4help_label, q4help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q4_guidecross)
+q4help_button = tk.Button(root_quizfour, command = lambda: show_help(root_q4help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q4help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz five.
 root_q5help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1481,11 +1493,9 @@ q5_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q5_guidebutton)
 q5_guidecross = tk.Button(root_q5help, text = 'X', command = lambda: close_help(root_q5help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q5_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q5help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q5help_label = tk.Label(root_quizfive, image = q5help_img)
-q5help_button = tk.Button(root_quizfive, command = lambda: show_help(root_q5help), image = q5help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q5help_label, q5help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q5_guidecross)
+q5help_button = tk.Button(root_quizfive, command = lambda: show_help(root_q5help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q5help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz six.
 root_q6help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1495,11 +1505,9 @@ q6_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q6_guidebutton)
 q6_guidecross = tk.Button(root_q6help, text = 'X', command = lambda: close_help(root_q6help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q6_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q6help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q6help_label = tk.Label(root_quizsix, image = q6help_img)
-q6help_button = tk.Button(root_quizsix, command = lambda: show_help(root_q6help), image = q6help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q6help_label, q6help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q6_guidecross)
+q6help_button = tk.Button(root_quizsix, command = lambda: show_help(root_q6help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q6help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz seven.
 root_q7help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1509,11 +1517,9 @@ q7_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q7_guidebutton)
 q7_guidecross = tk.Button(root_q7help, text = 'X', command = lambda: close_help(root_q7help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q7_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q7help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q7help_label = tk.Label(root_quizseven, image = q7help_img)
-q7help_button = tk.Button(root_quizseven, command = lambda: show_help(root_q7help), image = q7help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q7help_label, q7help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q7_guidecross)
+q7help_button = tk.Button(root_quizseven, command = lambda: show_help(root_q7help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q7help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz eight.
 root_q8help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1523,11 +1529,9 @@ q8_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q8_guidebutton)
 q8_guidecross = tk.Button(root_q8help, text = 'X', command = lambda: close_help(root_q8help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q8_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q8help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q8help_label = tk.Label(root_quizeight, image = q8help_img)
-q8help_button = tk.Button(root_quizeight, command = lambda: show_help(root_q8help), image = q8help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q8help_label, q8help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q8_guidecross)
+q8help_button = tk.Button(root_quizeight, command = lambda: show_help(root_q8help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q8help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz nine.
 root_q9help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
@@ -1537,33 +1541,39 @@ q9_guidebutton.place(relx = 0.02, rely = 0.5, anchor = 'w')
 rhoverbutton_list.append(q9_guidebutton)
 q9_guidecross = tk.Button(root_q9help, text = 'X', command = lambda: close_help(root_q9help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q9_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
-
-q9help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q9help_label = tk.Label(root_quiznine, image = q9help_img)
-q9help_button = tk.Button(root_quiznine, command = lambda: show_help(root_q9help), image = q9help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
-q9help_label, q9help_button.place(x = 1083, y = 435)
+quit_hoverlist.append(q9_guidecross)
+q9help_button = tk.Button(root_quiznine, command = lambda: show_help(root_q9help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q9help_button.place(x = 1083, y = 435)
 
 # Finally there is all the widgets on the main root.
 # The background is an image, as are the Quiz and Guide buttons.
+# A hover effect was created by having two images for each button, and having the hover effect switch between them.
 
-background = tk.PhotoImage(file = resource_path('Images/home_page.png'))
+background = tk.PhotoImage(file = 'Images/home_page.png')
 background_label = tk.Label(root_home, image = background)
 background_label.place(x = 0, y = 0, relwidth=1, relheight=1)
 
-quiz_button_img = tk.PhotoImage(file = resource_path('Images/quizzes_button.png'))
-quiz_button_label = tk.Label(root_home, image = quiz_button_img)
-quiz_button = tk.Button(root_home, image = quiz_button_img, command = lambda: show_frame(root_quizzes), bg = '#0277bc', bd = 0, activebackground = '#0277bc')
-quiz_button_label, quiz_button.place(anchor = 'center', x = 960, y = 670)
+quiz_button_img = tk.PhotoImage(file = 'Images/quizzes_button.png')
+altquiz_button_img = tk.PhotoImage(file = "Images/altquizzes_button.png")
+quiz_button = tk.Button(root_home, image = quiz_button_img, command = lambda: show_frame(root_quizzes), bg = '#0277bc', bd = 0, activebackground = '#0277bc', font = segoe_s)
+quiz_button.place(x = 960, y = 670, anchor = 'center')
 
-guides_button_img = tk.PhotoImage(file = resource_path('Images/guides_button.png'))
-guides_button_label = tk.Label(root_home, image = guides_button_img)
-guides_button = tk.Button(root_home, image = guides_button_img, command = lambda: show_frame(root_guides), bg = '#0277bc', bd = 0, activebackground = '#0277bc')
-guides_button_label, guides_button.place(anchor = 'center', x = 960, y = 910)
+quiz_button.bind('<Enter>', image_enter)
+quiz_button.bind('<Leave>', image_leave)
+
+guides_button_img = tk.PhotoImage(file = 'Images/guides_button.png')
+altguides_button_img = tk.PhotoImage(file = "Images/altguides_button.png")
+guides_button = tk.Button(root_home, image = guides_button_img, command = lambda: show_frame(root_guides), bg = '#0277bc', bd = 0, activebackground = '#0277bc', font = segoe_b)
+guides_button.place(x = 960, y = 910, anchor = 'center')
+
+guides_button.bind('<Enter>', image_enter)
+guides_button.bind('<Leave>', image_leave)
 
 # Calling all the functions needed to load widgets.
 loadframes()
 load_helpframes()
 loadbutton()
+final_unlocked()
 
 # Running the app.
-root_home.mainloop()
+root_home.mainloop()    
