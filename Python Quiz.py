@@ -1,6 +1,7 @@
 import ctypes
 import tkinter as tk
 from tkinter.font import Font
+import sys
 
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
@@ -213,6 +214,7 @@ def submitq1(x = None):
         else:
             q1result.config(text = f'{correct_no}/4 data types are correct.')
     final_unlocked()
+    print(sys.getsizeof(q1a1_v))
 
 def restartq1():
 
@@ -831,9 +833,9 @@ q3e_entry.insert(0, '()')
 q3submit_button = tk.Button(root_quizthree, text = 'Submit', command = submitq3, **subbutton_style)
 q3submit_button.place(x = 1375, y = 795)
 q3feedback = tk.Label(root_quizthree, **feedback_style)
-q3feedback.place(x = 1375, y = 665)
+q3feedback.place(x = 1150, y = 890)
 q3result = tk.Label(root_quizthree, **label_style)
-q3result.place(x = 1375, y = 695)
+q3result.place(x = 1150, y = 925)
 
 q3menu = tk.Button(root_quizthree, text = 'Menu', command = lambda: show_frame(root_quizzes), **topbutton_style)
 q3menu.place(x = 1160, y = 429)
@@ -1554,7 +1556,7 @@ background_label = tk.Label(root_home, image = background)
 background_label.place(x = 0, y = 0, relwidth=1, relheight=1)
 
 quiz_button_img = tk.PhotoImage(file = 'Images/quizzes_button.png')
-altquiz_button_img = tk.PhotoImage(file = "Images/altquizzes_button.png")
+altquiz_button_img = tk.PhotoImage(file = 'Images/altquizzes_button.png')
 quiz_button = tk.Button(root_home, image = quiz_button_img, command = lambda: show_frame(root_quizzes), bg = '#0277bc', bd = 0, activebackground = '#0277bc', font = segoe_s)
 quiz_button.place(x = 960, y = 670, anchor = 'center')
 
@@ -1562,7 +1564,7 @@ quiz_button.bind('<Enter>', image_enter)
 quiz_button.bind('<Leave>', image_leave)
 
 guides_button_img = tk.PhotoImage(file = 'Images/guides_button.png')
-altguides_button_img = tk.PhotoImage(file = "Images/altguides_button.png")
+altguides_button_img = tk.PhotoImage(file = 'Images/altguides_button.png')
 guides_button = tk.Button(root_home, image = guides_button_img, command = lambda: show_frame(root_guides), bg = '#0277bc', bd = 0, activebackground = '#0277bc', font = segoe_b)
 guides_button.place(x = 960, y = 910, anchor = 'center')
 
@@ -1574,6 +1576,6 @@ loadframes()
 load_helpframes()
 loadbutton()
 final_unlocked()
-
-# Running the app.
+print(sys.getsizeof(q1a1_entry))
+print(sys.getsizeof(q1a1))
 root_home.mainloop()    

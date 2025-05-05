@@ -265,7 +265,6 @@ def submitq2(x = None):
 
 def restartq2():
 
-    global q2guessed_operations
     q2submit_button.config(state = 'normal')
     q2a_entry.config(state = 'normal')
     q2b_entry.config(state = 'normal')
@@ -833,9 +832,9 @@ q3e_entry.insert(0, '()')
 q3submit_button = tk.Button(root_quizthree, text = 'Submit', command = submitq3, **subbutton_style)
 q3submit_button.place(x = 1375, y = 795)
 q3feedback = tk.Label(root_quizthree, **feedback_style)
-q3feedback.place(x = 1375, y = 665)
+q3feedback.place(x = 1150, y = 890)
 q3result = tk.Label(root_quizthree, **label_style)
-q3result.place(x = 1375, y = 695)
+q3result.place(x = 1150, y = 925)
 
 q3menu = tk.Button(root_quizthree, text = 'Menu', command = lambda: show_frame(root_quizzes), **topbutton_style)
 q3menu.place(x = 1160, y = 429)
@@ -1392,8 +1391,8 @@ g10button.place(x = 1360, y = 615)
 
 # Binding them all to hover effects and back-to-home button.
 hoverbutton_list.extend([g1button, g2button, g3button, g4button, g5button, g6button, g7button, g8button, g9button, g10button])
-guidesback = tk.Button(root_guides, text = 'Back', command = back_home, font = segoe_s, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
-guidesback.place(x = 935, y = 550)
+guidesback = tk.Button(root_guides, text = 'Back', command = back_home, font = segoe_bo, background = '#275b84', foreground = '#ffde57', activebackground = '#275b84', activeforeground = '#ffde57', borderwidth = 0)
+guidesback.place(x = 450, y = 820)
 rhoverbutton_list.append(guidesback)
 
 # Menu page for Quizzes.
@@ -1437,6 +1436,9 @@ rhoverbutton_list.append(quizzesback)
 # The help button itself can also be used to close as it toggles.
 
 # Help frame for quiz one.
+
+help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
+
 root_q1help = tk.Frame(root_home, width = 220, height = 55, background = '#0277bc')
 help_framelist.append(root_q1help)
 q1_guidebutton = tk.Button(root_q1help, text = 'Visit Guide One?', command = lambda: quiz_to_guide(root_guideone, root_q1help), font = segoe_s, background = '#275b84', foreground = '#ffde57', activebackground = '#ffde57', activeforeground = '#275b84', borderwidth = 0)
@@ -1445,9 +1447,7 @@ rhoverbutton_list.append(q1_guidebutton)
 q1_guidecross = tk.Button(root_q1help, text = 'X', command = lambda: close_help(root_q1help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q1_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q1_guidecross)
-
-q1help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q1help_button = tk.Button(root_quizone, command = lambda: show_help(root_q1help), image = q1help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q1help_button = tk.Button(root_quizone, command = lambda: show_help(root_q1help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q1help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz two.
@@ -1459,9 +1459,7 @@ rhoverbutton_list.append(q2_guidebutton)
 q2_guidecross = tk.Button(root_q2help, text = 'X', command = lambda: close_help(root_q2help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q2_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q2_guidecross)
-
-q2help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q2help_button = tk.Button(root_quiztwo, command = lambda: show_help(root_q2help), image = q2help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q2help_button = tk.Button(root_quiztwo, command = lambda: show_help(root_q2help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q2help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz three.
@@ -1473,9 +1471,7 @@ rhoverbutton_list.append(q3_guidebutton)
 q3_guidecross = tk.Button(root_q3help, text = 'X', command = lambda: close_help(root_q3help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q3_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q3_guidecross)
-
-q3help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q3help_button = tk.Button(root_quizthree, command = lambda: show_help(root_q3help), image = q3help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q3help_button = tk.Button(root_quizthree, command = lambda: show_help(root_q3help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q3help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz four.
@@ -1487,9 +1483,7 @@ rhoverbutton_list.append(q4_guidebutton)
 q4_guidecross = tk.Button(root_q4help, text = 'X', command = lambda: close_help(root_q4help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q4_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q4_guidecross)
-
-q4help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q4help_button = tk.Button(root_quizfour, command = lambda: show_help(root_q4help), image = q4help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q4help_button = tk.Button(root_quizfour, command = lambda: show_help(root_q4help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q4help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz five.
@@ -1501,9 +1495,7 @@ rhoverbutton_list.append(q5_guidebutton)
 q5_guidecross = tk.Button(root_q5help, text = 'X', command = lambda: close_help(root_q5help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q5_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q5_guidecross)
-
-q5help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q5help_button = tk.Button(root_quizfive, command = lambda: show_help(root_q5help), image = q5help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q5help_button = tk.Button(root_quizfive, command = lambda: show_help(root_q5help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q5help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz six.
@@ -1515,9 +1507,7 @@ rhoverbutton_list.append(q6_guidebutton)
 q6_guidecross = tk.Button(root_q6help, text = 'X', command = lambda: close_help(root_q6help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q6_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q6_guidecross)
-
-q6help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q6help_button = tk.Button(root_quizsix, command = lambda: show_help(root_q6help), image = q6help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q6help_button = tk.Button(root_quizsix, command = lambda: show_help(root_q6help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q6help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz seven.
@@ -1529,9 +1519,7 @@ rhoverbutton_list.append(q7_guidebutton)
 q7_guidecross = tk.Button(root_q7help, text = 'X', command = lambda: close_help(root_q7help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q7_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q7_guidecross)
-
-q7help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q7help_button = tk.Button(root_quizseven, command = lambda: show_help(root_q7help), image = q7help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q7help_button = tk.Button(root_quizseven, command = lambda: show_help(root_q7help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q7help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz eight.
@@ -1543,9 +1531,7 @@ rhoverbutton_list.append(q8_guidebutton)
 q8_guidecross = tk.Button(root_q8help, text = 'X', command = lambda: close_help(root_q8help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q8_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q8_guidecross)
-
-q8help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q8help_button = tk.Button(root_quizeight, command = lambda: show_help(root_q8help), image = q8help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q8help_button = tk.Button(root_quizeight, command = lambda: show_help(root_q8help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q8help_button.place(x = 1083, y = 435)
 
 # Help frame for quiz nine.
@@ -1557,13 +1543,12 @@ rhoverbutton_list.append(q9_guidebutton)
 q9_guidecross = tk.Button(root_q9help, text = 'X', command = lambda: close_help(root_q9help), font  = segoe_s, background = '#e81123', foreground = '#ffffff', borderwidth = 0)
 q9_guidecross.place(relx = 0.98, rely = 0.5, anchor = 'e')
 quit_hoverlist.append(q9_guidecross)
-
-q9help_img = tk.PhotoImage(file = resource_path('Images/help_button.png'))
-q9help_button = tk.Button(root_quiznine, command = lambda: show_help(root_q9help), image = q9help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
+q9help_button = tk.Button(root_quiznine, command = lambda: show_help(root_q9help), image = help_img, bg = '#275b84', bd = 0, activebackground = '#275b84', borderwidth = 0)
 q9help_button.place(x = 1083, y = 435)
 
 # Finally there is all the widgets on the main root.
 # The background is an image, as are the Quiz and Guide buttons.
+# A hover effect was created by having two images for each button, and having the hover effect switch between them.
 
 background = tk.PhotoImage(file = resource_path('Images/home_page.png'))
 background_label = tk.Label(root_home, image = background)
@@ -1592,4 +1577,4 @@ loadbutton()
 final_unlocked()
 
 # Running the app.
-root_home.mainloop()
+root_home.mainloop()    
